@@ -131,6 +131,15 @@ type ProcessManager struct {
 	filterErrorFrames bool
 
 	metaEnrichers []process.MetaEnricher
+
+	// probeAttachers is the list of per-process probe attachers registered via
+	// RegisterProbeAttacher. Protected by mu.
+	probeAttachers []ProbeAttacher
+
+	// attachedProbes maps each PID to the set of ProbeAttachers that have successfully
+	// attached to it. Used to guarantee at-most-once Attach per PID and to drive
+	// Detach on exit. Protected by mu.
+	attachedProbes map[libpf.PID][]ProbeAttacher
 }
 
 // Mapping represents an executable memory mapping of a process.
